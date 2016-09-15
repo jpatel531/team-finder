@@ -18,6 +18,8 @@ I decided to go for more list-like approach of incrementing IDs and trying each 
 
 With regards to speed and performance, I opted to search the API in ranges, such as IDs 1-100. These 100 requests would be executed concurrently and the program would block until this search batch is done. If the search is complete (all teams have been found), it prints out the players. If not, it tackles batches 101-200. To stop this occuring forever if the team does not exist in the API, if the number of 404s reaches a threshold, the program exits.
 
+Using `/usr/bin/time` and on my home network, the time taken has ranged from 240ms to 1100ms, with an average of 350ms.
+
 ## Installation
 
 To place this package in your `$GOPATH`, you can use `go get`:
