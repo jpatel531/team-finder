@@ -9,7 +9,7 @@ import (
 )
 
 type Search interface {
-	DoBatch(startID, size, incr int) (complete bool)
+	DoBatch(startID, size, incr, notFoundThreshold int) (complete bool)
 	PlayersFound() teams.Players
 }
 
@@ -25,12 +25,11 @@ type search struct {
 	fetcher.Fetcher
 }
 
-func (s *search) DoBatch(startID, size, incr int) (complete bool) {
+func (s *search) DoBatch(startID, size, incr, notFoundThreshold int) (complete bool) {
 	var (
-		wg                sync.WaitGroup
-		i                 int
-		notFoundCount     int32
-		notFoundThreshold = size
+		wg            sync.WaitGroup
+		i             int
+		notFoundCount int32
 	)
 
 	for i = startID; i < startID+size; i += incr {
@@ -50,7 +49,7 @@ func (s *search) DoBatch(startID, size, incr int) (complete bool) {
 	}
 
 	if !s.IsComplete() {
-		return s.DoBatch(i, size, incr)
+		return s.DoBatch(i, size, incr, notFoundThreshold)
 	}
 	return true
 }

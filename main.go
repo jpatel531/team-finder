@@ -6,7 +6,13 @@ import (
 	"sort"
 )
 
-const endpoint = "https://vintagemonster.onefootball.com/api/teams/en/%d.json"
+const (
+	endpoint          = "https://vintagemonster.onefootball.com/api/teams/en/%d.json"
+	batchSize         = 100
+	startID           = 1
+	increment         = 1
+	notFoundThreshold = 100
+)
 
 func main() {
 	targets := []string{
@@ -24,7 +30,7 @@ func main() {
 
 	search := search.New(endpoint, targets)
 
-	complete := search.DoBatch(1, 100, 1)
+	complete := search.DoBatch(startID, batchSize, increment, notFoundThreshold)
 	if complete {
 		log.Println("All teams found 🎉")
 		players := search.PlayersFound()

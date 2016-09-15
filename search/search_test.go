@@ -92,7 +92,7 @@ func TestDoBatchReturnsFalseIfNotFoundCountExceedsThreshold(t *testing.T) {
 
 	s := &search{tgs, f}
 
-	found := s.DoBatch(1, 3, 1)
+	found := s.DoBatch(1, 3, 1, 3)
 	assert.False(t, found)
 	tgs.AssertExpectations(t)
 	f.AssertExpectations(t)
@@ -122,7 +122,7 @@ func TestDoBatchTriesWithSubsequentBatchIfNotYetComplete(t *testing.T) {
 	}
 
 	s := &search{tgs, f}
-	s.DoBatch(startID, batchSize, increment)
+	s.DoBatch(startID, batchSize, increment, batchSize)
 	tgs.AssertExpectations(t)
 	f.AssertExpectations(t)
 }
