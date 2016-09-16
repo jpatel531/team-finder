@@ -28,12 +28,13 @@ func main() {
 		"FC Bayern Munich",
 	}
 
-	search := search.New(endpoint, targets)
+	s := search.New(endpoint, targets)
 
-	complete := search.DoBatch(startID, batchSize, increment, notFoundThreshold)
+	complete := s.DoBatch(startID, batchSize, increment, notFoundThreshold)
 	if complete {
 		log.Println("All teams found 🎉")
-		players := search.PlayersFound()
+
+		players := s.PlayersFound()
 		sort.Sort(players)
 		log.Println(players)
 	} else {

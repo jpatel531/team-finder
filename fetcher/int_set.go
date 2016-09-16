@@ -2,6 +2,7 @@ package fetcher
 
 import "sync"
 
+// This set of integer IDs holds a RWMutex for safe concurrent access.
 type intSet struct {
 	*sync.RWMutex
 	data map[int]bool

@@ -6,6 +6,15 @@ import (
 	"sync"
 )
 
+/*
+Targets is an interface that tracks the progress of our search.
+
+It holds in its underlying data the teams we are looking for and, if they are found,
+the data associated with it. It also holds those teams' players which we will need to
+render once the search is complete.
+
+It holds a sync.RWMutex to ensure safe concurrent access to its underlying data.
+*/
 type Targets interface {
 	TeamIsTargeted(teamName string) bool
 	Hit(team *teams.Team)
@@ -31,6 +40,10 @@ type targets struct {
 	players map[string]*teams.Player
 }
 
+// A team is only targeted if its name is a key in the underlying
+// teams map, and if the value of that key is nil.
+// Because when a target is hit, the value becomes non-nil, a team
+// that has been found is no longer targeted.
 func (t *targets) TeamIsTargeted(teamName string) bool {
 	t.RLock()
 	defer t.RUnlock()
@@ -38,6 +51,12 @@ func (t *targets) TeamIsTargeted(teamName string) bool {
 	return exists && team == nil
 }
 
+/*
+One calls `Hit` when a target has been hit, i.e. when a team has been found.
+
+We store it in the underlying `teams` map, and its players in our underlying `players`
+map.
+*/
 func (t *targets) Hit(team *teams.Team) {
 	name := team.Name
 	if !t.TeamIsTargeted(name) {
@@ -63,6 +82,7 @@ func (t *targets) Hit(team *teams.Team) {
 	}
 }
 
+// All the targets have been found if all its teams are not nil.
 func (t *targets) IsComplete() bool {
 	for _, team := range t.teams {
 		if team == nil {
@@ -72,6 +92,7 @@ func (t *targets) IsComplete() bool {
 	return true
 }
 
+// Returns all the targeted players
 func (t *targets) PlayersFound() (players teams.Players) {
 	for _, player := range t.players {
 		players = append(players, player)

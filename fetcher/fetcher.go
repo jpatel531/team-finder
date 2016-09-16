@@ -9,6 +9,10 @@ import (
 	"net/http"
 )
 
+// A Fetcher's purpose is to fetch the team with a given ID at an endpoint,
+// parse it, and return it, as well as any errors encountered.
+// It does not duplicate work. It holds a set of integer IDs and checks
+// that the ID has not been previously scraped before doing its work.
 type Fetcher interface {
 	Fetch(id int) (team *teams.Team, err error)
 }

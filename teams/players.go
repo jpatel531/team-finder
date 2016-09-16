@@ -21,6 +21,8 @@ func (p *Player) String() string {
 
 type Players []*Player
 
+// Calling fmt/log.Print on this structure
+// will return this return value.
 func (p Players) String() (repr string) {
 	for _, player := range p {
 		repr += player.String()

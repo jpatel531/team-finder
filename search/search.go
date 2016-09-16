@@ -20,11 +20,28 @@ func New(endpoint string, teamNames []string) Search {
 	}
 }
 
+// The private search struct available only in this package.
+// It is composed of targets and an HTTP fetcher.
 type search struct {
 	targets.Targets
 	fetcher.Fetcher
 }
 
+/*
+DoBatch iterates through a given range of numbers.
+
+For each number it tries to send a request for a team with that number as its ID. For
+this request, it spawns a new goroutine.
+
+If that request results in a 404, it increments an atomic counter. If this atomic counter
+exceeds the threshold for the batch, it returns false, assuming that we have exceeded
+the number of teams there are in the API.
+
+If it has not exceeded this threshold, and the search is still incomplete, it calls DoBatch
+on the next range.
+
+If the search is complete, it returns true.
+*/
 func (s *search) DoBatch(startID, size, incr, notFoundThreshold int) (complete bool) {
 	var (
 		wg            sync.WaitGroup
@@ -54,6 +71,11 @@ func (s *search) DoBatch(startID, size, incr, notFoundThreshold int) (complete b
 	return true
 }
 
+// For a given ID, a request is initiated for its contents. If its name is one of our targets
+// we store it in the targets.Targets structure.
+//
+// If the search is unsuccessful, we scan the team's previous, next and following opponents
+// to see if they're a team target. If so, we follow its ID to retrieve the team data.
 func (s *search) tryTeam(teamID int) (err error) {
 	if s.IsComplete() {
 		return
